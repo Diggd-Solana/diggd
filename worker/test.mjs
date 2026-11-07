@@ -76,7 +76,7 @@ check('unknown token', (await call(`/v1/token/${UNKNOWN}`))[0] === 404);
 
 // ---- sealing ----
 const [c1, w1] = await make(dev, {});
-check('bone sealed', c1 === 201 && w1.id === 1 && w1.status === 'buried' && w1.url === 'https://diggd.test/#/z/1', w1);
+check('bone sealed', c1 === 201 && w1.id === 1 && w1.status === 'buried' && w1.url === 'https://diggd.test/#/b/1', w1);
 check('creator bone is marked', w1.creatorBone === true && w1.startMcap === 40000, w1);
 const [, w2] = await make(reader, { teaser: 'What the dev told me', targetUsd: 200000 });
 check('anyone else is not marked creator', w2.creatorBone === false && w2.author === reader.address, w2);
