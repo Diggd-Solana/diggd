@@ -14,7 +14,7 @@ database_id = "30ed4015-43fd-4cdb-8236-68aa4ddfecfc"
 
 [vars]
 # $DIGGD mint after launch. Empty = no burn to bone, no holders-first window.
-TOKEN_ADDRESS = ""
+TOKEN_ADDRESS = "gJ7ZvMtqhUxxcrosSiAMVhy2PGJAUYRP7bk1gNrpump"
 TOKEN_DECIMALS = "6"
 # $DIGGD burned to bone one message.
 BURY_BURN = "50000"

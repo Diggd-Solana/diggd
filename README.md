@@ -57,6 +57,8 @@ curl https://diggd-api.orchard-api.workers.dev/v1/bones?status=dug
 - Burn 50K in the same transaction for each bone.
 - Creator fees: 70% buy back and burn, 30% servers.
 
+Mint: `gJ7ZvMtqhUxxcrosSiAMVhy2PGJAUYRP7bk1gNrpump`
+
 Both gates are off while `TOKEN_ADDRESS` is empty in `wrangler.toml`.
 
 ## Run your own
