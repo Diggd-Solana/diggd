@@ -1,0 +1,938 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DIGGD — buried now, dug up at the target</title>
+  <meta name="description" content="Bury a message on Solana. It stays six feet under until a token hits its market cap or a date arrives. The hash goes on-chain, so nobody can change a word.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://diggd.fun/">
+  <meta property="og:title" content="DIGGD — buried now. Dug up at 1M.">
+  <meta property="og:description" content="Messages that get dug up at a market cap. The roadmap, the next CA, the confession: six feet under until the chart digs it out.">
+  <meta property="og:image" content="https://diggd.fun/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://diggd.fun/og-image.png">
+  <link rel="icon" href="avatar.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bowlby+One&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=Space+Mono:wght@400;700&display=swap" media="print" onload="this.media='all'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bowlby+One&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=Space+Mono:wght@400;700&display=swap"></noscript>
+  <style>
+    :root {
+      --sky: #f6ecd8;
+      --paper: #fffaf0;
+      --grass: #6aa84f;
+      --grass-2: #4f8a38;
+      --s1: #6b3f24;
+      --s2: #54301c;
+      --s3: #402414;
+      --s4: #2e190d;
+      --deep: #1f1009;
+      --rust: #d9662b;
+      --rust-2: #f08048;
+      --gold: #ffc94a;
+      --bone: #f4ead6;
+      --ink: #2a170d;
+      --ink-2: #5d4434;
+      --muted: #c9b29c;
+      --bad: #ff9a8a;
+      --display: "Bowlby One", Impact, sans-serif;
+      --sans: "DM Sans", system-ui, sans-serif;
+      --mono: "Space Mono", ui-monospace, Consolas, monospace;
+      color-scheme: dark;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; background: var(--s3); color: var(--bone); font: 16px/1.6 var(--sans); overflow-x: hidden; }
+    a { color: inherit; }
+    h1, h2, h3, p { margin: 0; }
+    code, .mono { font-family: var(--mono); }
+    svg.i { width: 17px; height: 17px; flex: none; }
+    .page { display: none; }
+    .page.on { display: block; }
+    .in { max-width: 1060px; margin: 0 auto; padding: 0 40px; }
+    .in > *, .two > *, .one > * { min-width: 0; }
+
+    /* the rail: a depth ruler on the left */
+    .rail { position: fixed; left: 0; top: 0; bottom: 0; width: 232px; z-index: 20; display: flex; flex-direction: column; background: var(--deep); border-right: 4px solid var(--rust); }
+    .rail .brand { display: flex; align-items: center; gap: 12px; padding: 22px 20px 20px; text-decoration: none; font: 400 25px var(--display); letter-spacing: .01em; border-bottom: 6px solid var(--grass); background: var(--sky); color: var(--ink); }
+    .rail .brand img { width: 42px; height: 42px; border-radius: 10px; }
+    .menu { display: flex; flex-direction: column; padding: 14px 0; flex: 1; background: repeating-linear-gradient(180deg, transparent 0 31px, rgba(244, 234, 214, .07) 31px 32px); }
+    .menu a { position: relative; display: flex; align-items: baseline; gap: 12px; padding: 10px 20px 10px 22px; text-decoration: none; font-weight: 500; color: var(--muted); }
+    .menu a small { width: 38px; font: 400 11px var(--mono); color: rgba(201, 178, 156, .6); }
+    .menu a:hover { color: var(--bone); }
+    .menu a.on { color: var(--gold); }
+    .menu a.on::before { content: ""; position: absolute; left: -4px; top: 8px; bottom: 8px; width: 8px; background: var(--gold); }
+    .menu a.on small { color: var(--gold); }
+    .rail-foot { padding: 16px 20px 22px; display: grid; gap: 10px; }
+    .rail-foot .mono { font-size: 11px; color: rgba(201, 178, 156, .6); }
+    .bar { display: none; }
+    main, footer { margin-left: 232px; }
+
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 46px; padding: 0 22px; border: 3px solid var(--bone); border-radius: 999px; background: none; color: var(--bone); font: 700 15px var(--sans); text-decoration: none; cursor: pointer; white-space: nowrap; transition: background .15s, color .15s, transform .08s; }
+    .btn:hover { background: var(--bone); color: var(--ink); }
+    .btn:active { transform: translateY(1px); }
+    .btn.hot { background: var(--rust); border-color: var(--rust); color: #fff; box-shadow: 0 4px 0 #8c3a12; }
+    .btn.hot:hover { background: var(--rust-2); border-color: var(--rust-2); }
+    .btn.ink { border-color: var(--ink); color: var(--ink); }
+    .btn.ink:hover { background: var(--ink); color: var(--sky); }
+    .btn.sm { height: 36px; padding: 0 15px; font-size: 13.5px; border-width: 2px; }
+    .btn:disabled { opacity: .5; cursor: not-allowed; }
+    .who { font: 700 12px var(--mono); }
+
+    /* surface: cream sky, then a grass edge */
+    .sky { background: var(--sky); color: var(--ink); }
+    .grass { height: 22px; background: var(--grass); position: relative; }
+    .grass::before { content: ""; position: absolute; left: 0; right: 0; top: -14px; height: 15px; background: radial-gradient(7px 15px at 7px 15px, var(--grass) 98%, transparent) 0 0 / 18px 15px repeat-x, radial-gradient(5px 11px at 5px 15px, var(--grass-2) 98%, transparent) 9px 0 / 18px 15px repeat-x; }
+    .grass::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 8px; background: var(--grass-2); }
+    .hero { padding-top: 76px; padding-bottom: 60px; }
+    .eyebrow { font: 700 12px var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--rust); }
+    .hero h1 { font: 400 clamp(46px, 7.4vw, 104px)/.96 var(--display); text-transform: uppercase; margin: 18px 0 26px; letter-spacing: -.01em; }
+    .hero h1 em { font-style: normal; color: var(--rust); }
+    .lede { font-size: 19px; color: var(--ink-2); max-width: 600px; }
+    .cta { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 30px; }
+
+    /* the yard: one strip of soil, a shaft per bone */
+    .yard { background: linear-gradient(180deg, var(--s1) 0 34%, var(--s2) 34% 68%, var(--s3) 68%); position: relative; }
+    .yard::before, .soil::before { content: ""; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(circle at 20% 30%, rgba(0, 0, 0, .18) 0 3px, transparent 4px) 0 0 / 46px 38px, radial-gradient(circle at 70% 60%, rgba(255, 255, 255, .06) 0 2px, transparent 3px) 0 0 / 34px 52px; }
+    .yard .in { position: relative; padding-top: 0; padding-bottom: 40px; }
+    .shafts { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 18px; }
+    .depth { position: absolute; left: 6px; top: 4px; height: 290px; display: flex; flex-direction: column; justify-content: space-between; font: 400 10px var(--mono); color: rgba(244, 234, 214, .5); }
+
+    /* one shaft: hole dug from the surface down to the bone */
+    .shaft { position: relative; height: 300px; overflow: hidden; }
+    .shaft .hole { position: absolute; left: 50%; top: 0; width: 46%; height: 0; transform: translateX(-50%); background: var(--deep); border-radius: 0 0 40px 40px; transition: height 1.1s cubic-bezier(.2, .7, .2, 1); box-shadow: inset 0 -6px 0 rgba(255, 201, 74, .18); }
+    .shaft .bone { position: absolute; left: 50%; bottom: 20px; width: 62%; max-width: 110px; transform: translateX(-50%) rotate(-8deg); }
+    .shaft .flag { position: absolute; left: 6px; right: 6px; top: 0; transition: top 1.1s cubic-bezier(.2, .7, .2, 1); border-top: 2px dashed var(--gold); font: 700 11px var(--mono); color: var(--gold); padding-top: 3px; text-align: right; }
+    .shaft .ft { position: absolute; left: 6px; bottom: 8px; font: 700 11px var(--mono); color: var(--bone); background: var(--deep); padding: 1px 6px; }
+    .shaft.up .bone { animation: pop .6s cubic-bezier(.3, 1.6, .5, 1) forwards; }
+    @keyframes pop { to { bottom: 236px; transform: translateX(-50%) rotate(8deg); } }
+    .shaft .found { position: absolute; left: 8px; right: 8px; top: 12px; padding: 10px 12px; background: var(--bone); color: var(--ink); font: 700 14px/1.35 var(--sans); opacity: 0; transition: opacity .4s .3s; }
+    .shaft.up .found { opacity: 1; }
+    .plot { display: flex; flex-direction: column; text-decoration: none; min-width: 0; }
+    .plot .tag { min-height: 60px; padding: 8px 0 0; }
+    .plot .tag b { display: block; font: 700 15px/1.25 var(--sans); overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+    .plot .tag span { font: 400 11px var(--mono); color: var(--muted); }
+    a.plot:hover .tag b { color: var(--gold); }
+    .plot.demo .tag span { color: var(--gold); }
+
+    /* strata: the stats are layers of rock */
+    .strata > div { display: flex; align-items: baseline; gap: 18px; padding: 16px 40px; border-top: 1px solid rgba(0, 0, 0, .25); font: 700 12px var(--mono); letter-spacing: .1em; text-transform: uppercase; }
+    .strata > div:nth-child(1) { background: var(--s4); }
+    .strata > div:nth-child(2) { background: #26150b; }
+    .strata > div:nth-child(3) { background: #1f1109; }
+    .strata > div:nth-child(4) { background: #190d07; }
+    .strata em { font-style: normal; width: 110px; color: rgba(201, 178, 156, .55); }
+    .strata b { font: 400 32px/1 var(--display); color: var(--bone); letter-spacing: 0; min-width: 72px; }
+
+    /* sections */
+    .sec { padding: 96px 0; }
+    .soil { position: relative; background: var(--s3); }
+    .label { display: inline-block; font: 700 12px var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--gold); margin-bottom: 14px; }
+    .sky .label { color: var(--rust); }
+    h2, .pagehead h1 { font: 400 clamp(32px, 4.4vw, 56px)/1.04 var(--display); text-transform: uppercase; }
+    .sub { color: var(--muted); max-width: 660px; margin-top: 14px; font-size: 17px; }
+    .sky .sub { color: var(--ink-2); }
+    .fine { font-size: 14px; color: var(--muted); margin-top: 14px; }
+    .fine a { color: var(--bone); font-weight: 700; }
+    .sky .fine, .sky .fine a { color: var(--ink-2); }
+
+    /* how it works: a tunnel going down */
+    .tunnel { position: relative; margin-top: 40px; padding-left: 120px; }
+    .tunnel::before { content: ""; position: absolute; left: 52px; top: 10px; bottom: 10px; border-left: 4px dashed var(--rust); }
+    .tunnel article { position: relative; padding: 4px 0 46px; }
+    .tunnel article:last-child { padding-bottom: 0; }
+    .tunnel .d { position: absolute; left: -120px; top: 0; width: 108px; text-align: center; font: 700 12px var(--mono); color: var(--deep); background: var(--gold); padding: 6px 0; }
+    .tunnel h3 { font: 400 28px/1.15 var(--display); text-transform: uppercase; margin-bottom: 8px; }
+    .tunnel p { max-width: 640px; color: var(--muted); font-size: 17px; }
+
+    /* what to bury: dig tags */
+    .tags { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px 18px; margin-top: 36px; }
+    .dtag { position: relative; padding: 22px 22px 22px 58px; background: var(--paper); border: 3px solid var(--ink); border-radius: 6px 30px 30px 6px; color: var(--ink); }
+    .dtag::before { content: ""; position: absolute; left: 18px; top: 50%; width: 16px; height: 16px; margin-top: -8px; border-radius: 50%; border: 3px solid var(--ink); background: var(--sky); }
+    .dtag h3 { font: 400 20px/1.15 var(--display); text-transform: uppercase; margin-bottom: 6px; }
+    .dtag p { color: var(--ink-2); font-size: 15px; }
+    .dtag:nth-child(3n + 2) { background: var(--gold); }
+
+    .final { background: var(--grass); color: var(--ink); }
+    .final .in { display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap; padding-top: 54px; padding-bottom: 54px; }
+    .final h2 { font-size: clamp(30px, 4vw, 50px); }
+
+    /* pages */
+    .pagehead { padding-top: 64px; padding-bottom: 44px; }
+    .pagehead h1 { font-size: clamp(38px, 6vw, 76px); }
+    .tabs { display: flex; gap: 8px; flex-wrap: wrap; }
+    .tab { padding: 8px 16px; border: 2px solid var(--bone); border-radius: 999px; background: transparent; color: var(--bone); font: 700 14px var(--sans); cursor: pointer; }
+    .tab[aria-selected="true"] { background: var(--gold); border-color: var(--gold); color: var(--ink); }
+    .filter { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; justify-content: space-between; }
+    .filter input { width: min(440px, 100%); padding: 11px 16px; border: 2px solid rgba(244, 234, 214, .3); border-radius: 999px; background: var(--deep); color: var(--bone); font: 14px var(--mono); outline: 0; }
+    .filter input:focus { border-color: var(--gold); }
+    .board { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 30px 18px; margin-top: 30px; }
+    .board .plot { background: none; }
+    .board .shaft { background: linear-gradient(180deg, var(--s1) 0 34%, var(--s2) 34% 68%, #36200f 68%); border-top: 8px solid var(--grass); }
+    .board .plot.dug .paper { min-height: 308px; }
+    .paper { padding: 18px; background: var(--paper); color: var(--ink); border-top: 8px solid var(--grass); white-space: pre-wrap; overflow-wrap: anywhere; font-size: 15px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 11; -webkit-box-orient: vertical; }
+    .pill { display: inline-block; padding: 1px 8px; border-radius: 999px; font: 700 10.5px var(--mono); letter-spacing: .04em; text-transform: uppercase; white-space: nowrap; background: var(--deep); color: var(--muted); }
+    .pill.buried { background: var(--s1); color: var(--bone); }
+    .pill.dug { background: var(--gold); color: var(--ink); }
+    .pill.dev { background: var(--rust); color: #fff; }
+    .chips { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; margin-bottom: 4px; font: 700 12px var(--mono); }
+    .empty { padding: 50px 20px; text-align: center; color: var(--muted); border: 3px dashed rgba(244, 234, 214, .25); grid-column: 1 / -1; }
+    .empty a { color: var(--gold); font-weight: 700; }
+
+    /* one bone */
+    .one { display: grid; grid-template-columns: 280px minmax(0, 1fr); gap: 40px; align-items: start; padding-top: 56px; padding-bottom: 20px; }
+    .one .shaft { height: 460px; background: linear-gradient(180deg, var(--s1) 0 34%, var(--s2) 34% 68%, #36200f 68%); border-top: 10px solid var(--grass); }
+    .one h1 { font: 400 clamp(28px, 4vw, 48px)/1.08 var(--display); overflow-wrap: anywhere; margin: 10px 0 18px; text-transform: uppercase; }
+    .meter { display: flex; flex-wrap: wrap; gap: 6px 18px; font: 700 13px var(--mono); color: var(--muted); }
+    .meter b { color: var(--gold); }
+    .kv { display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 8px 16px; font: 13px var(--mono); }
+    .kv span { color: var(--ink-2); }
+    .kv b { font-weight: 700; overflow-wrap: anywhere; }
+    .kv a { color: var(--rust); }
+    .verified { display: flex; gap: 10px; align-items: flex-start; margin-top: 16px; padding: 12px 14px; background: rgba(106, 168, 79, .2); color: var(--ink); font-size: 14.5px; border-left: 4px solid var(--grass-2); }
+    .verified svg { color: var(--grass-2); width: 18px; height: 18px; flex: none; margin-top: 2px; }
+    .verified.bad { background: rgba(255, 120, 100, .15); border-color: #c0392b; }
+    .gate { text-align: center; }
+
+    /* field notebook: forms, docs, proof cards */
+    .note-book { --line: rgba(42, 23, 13, .09); position: relative; background: var(--paper); color: var(--ink); border: 3px solid var(--ink); border-radius: 12px; padding: 30px 32px; background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px); background-size: 22px 22px; box-shadow: 8px 8px 0 var(--deep); }
+    .note-book h3 { font: 400 22px/1.2 var(--display); text-transform: uppercase; margin-bottom: 12px; }
+    .note-book p { color: var(--ink-2); }
+    .note-book .fine, .note-book .fine a { color: var(--ink-2); }
+    .note-book .btn { border-color: var(--ink); color: var(--ink); }
+    .note-book .btn:hover { background: var(--ink); color: var(--paper); }
+    .note-book .btn.hot { border-color: var(--rust); color: #fff; }
+    .note-book .btn.hot:hover { background: var(--rust-2); color: #fff; }
+    .note-book code { background: rgba(42, 23, 13, .08); padding: 1px 6px; border-radius: 4px; font-size: 12.5px; overflow-wrap: anywhere; }
+    .form { display: grid; gap: 18px; max-width: 760px; }
+    .field label { display: block; font: 700 11px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-2); margin-bottom: 7px; }
+    .field input, .field textarea { width: 100%; padding: 12px 14px; border: 2px solid var(--ink); border-radius: 8px; background: #fff; color: var(--ink); font: 15.5px var(--sans); outline: 0; }
+    .field textarea { min-height: 170px; resize: vertical; line-height: 1.55; }
+    .field input:focus, .field textarea:focus { border-color: var(--rust); box-shadow: 0 0 0 3px rgba(217, 102, 43, .2); }
+    .field small { display: block; margin-top: 6px; color: var(--ink-2); font-size: 13.5px; }
+    .field small.bad { color: #b3261e; }
+    .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    .presets { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+    .status { min-height: 22px; font-size: 14.5px; color: var(--ink-2); }
+    .status.bad { color: #b3261e; }
+    .callout { padding: 12px 16px; background: var(--gold); color: var(--ink); border-radius: 8px; font-size: 15px; }
+    .codebox { margin-top: 12px; background: var(--deep); color: var(--bone); border-radius: 8px; padding: 14px 16px; font: 12.5px/1.7 var(--mono); overflow-x: auto; white-space: pre; position: relative; }
+    .codebox code { background: none; padding: 0; }
+    .codebox .cp { position: absolute; top: 8px; right: 8px; background: var(--s2); color: var(--bone); border: 0; border-radius: 6px; font: 700 11px var(--mono); padding: 4px 9px; cursor: pointer; }
+    .two { display: grid; grid-template-columns: 1fr 1fr; gap: 26px; }
+    .note-book .tabs { margin-top: 16px; }
+    .note-book .tab { border-color: var(--ink); color: var(--ink); }
+    .note-book .tab[aria-selected="true"] { background: var(--ink); color: var(--gold); }
+
+    /* $DIGGD: three layers */
+    .layers { margin-top: 10px; border-top: 3px solid var(--deep); }
+    .layer { display: grid; grid-template-columns: 90px 220px minmax(0, 1fr); gap: 24px; align-items: center; padding: 26px 0; border-bottom: 3px solid var(--deep); }
+    .layer .d { font: 700 12px var(--mono); color: var(--gold); }
+    .layer .amt { font: 400 30px/1.1 var(--display); }
+    .layer .amt small { display: block; font: 700 11px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+    .layer ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; color: var(--muted); }
+    .layer li { display: flex; gap: 10px; }
+    .layer li svg { width: 15px; height: 15px; margin-top: 5px; color: var(--grass); flex: none; }
+    .layer.hot .amt { color: var(--gold); }
+    .split { display: flex; height: 54px; border-radius: 8px; overflow: hidden; margin-top: 16px; font: 700 15px var(--sans); }
+    .split div { display: flex; align-items: center; padding: 0 14px; white-space: nowrap; }
+    .ca { margin-top: 10px; padding: 12px 14px; border: 2px dashed var(--ink); border-radius: 8px; font: 12.5px var(--mono); overflow-wrap: anywhere; background: #fff; }
+
+    /* docs */
+    .docs { display: grid; grid-template-columns: 210px minmax(0, 1fr); gap: 30px; align-items: start; padding-top: 56px; }
+    .side { position: sticky; top: 24px; }
+    .side b { display: block; font: 700 11px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin: 18px 0 6px; }
+    .side b:first-child { margin-top: 0; }
+    .side a { display: block; padding: 5px 0 5px 12px; border-left: 3px solid rgba(244, 234, 214, .15); text-decoration: none; color: var(--muted); font-size: 15px; }
+    .side a:hover { color: var(--bone); }
+    .side a.on { border-color: var(--gold); color: var(--gold); }
+    .doc h1 { font: 400 34px/1.1 var(--display); text-transform: uppercase; margin: 0 0 18px; }
+    .doc h2 { font: 700 21px var(--sans); text-transform: none; margin: 28px 0 10px; }
+    .doc p + p { margin-top: 12px; }
+    .doc ul, .doc ol { padding-left: 22px; color: var(--ink-2); }
+    .doc li { margin: 6px 0; }
+    .doc b { color: var(--ink); }
+    .doc a { color: var(--rust); font-weight: 700; }
+
+    /* dig log */
+    .log { border-left: 4px solid var(--rust); margin-left: 8px; }
+    .log article { position: relative; padding: 0 0 40px 34px; }
+    .log article::before { content: ""; position: absolute; left: -12px; top: 4px; width: 20px; height: 20px; border-radius: 50%; background: var(--s3); border: 4px solid var(--rust); }
+    .log article.now::before { background: var(--gold); border-color: var(--gold); }
+    .log .ph { font: 700 12px var(--mono); color: var(--gold); letter-spacing: .08em; text-transform: uppercase; }
+    .log h3 { font: 400 26px/1.2 var(--display); text-transform: uppercase; margin: 4px 0 8px; }
+    .log ul { margin: 0; padding-left: 20px; color: var(--muted); }
+
+    footer { background: #140a05; border-top: 10px solid var(--s4); }
+    .foot { display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr; gap: 20px; padding-top: 40px; padding-bottom: 24px; }
+    .foot b { display: block; font: 700 12px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+    .foot a { display: block; text-decoration: none; color: var(--bone); padding: 3px 0; font-size: 15px; }
+    .foot a:hover { color: var(--gold); }
+    .foot .logo { display: flex; align-items: center; gap: 10px; font: 400 22px var(--display); }
+    .foot .logo img { width: 34px; height: 34px; border-radius: 8px; }
+    .legal { padding-bottom: 36px; font-size: 13.5px; color: rgba(201, 178, 156, .65); }
+    .toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); background: var(--gold); color: var(--ink); padding: 11px 18px; border-radius: 999px; font: 700 14px var(--sans); opacity: 0; pointer-events: none; transition: opacity .2s; z-index: 40; max-width: calc(100% - 32px); text-align: center; }
+    .toast.on { opacity: 1; }
+
+    @media (max-width: 1100px) { .shafts { grid-template-columns: repeat(3, minmax(0, 1fr)); } .shafts > :nth-child(n+4) { display: none; } }
+    @media (max-width: 900px) {
+      .rail { position: static; width: auto; border-right: 0; flex-direction: row; display: none; }
+      .bar { position: sticky; top: 0; z-index: 20; display: flex; align-items: center; gap: 12px; height: 64px; padding: 0 16px; background: var(--sky); color: var(--ink); border-bottom: 5px solid var(--grass); }
+      .bar .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; font: 400 22px var(--display); margin-right: auto; }
+      .bar .brand img { width: 36px; height: 36px; border-radius: 9px; }
+      .bar .btn { border-color: var(--ink); color: var(--ink); }
+      .rail.open { display: block; position: fixed; top: 64px; left: 0; right: 0; bottom: auto; z-index: 19; }
+      .rail .brand { display: none; }
+      main, footer { margin-left: 0; }
+      .in { padding: 0 24px; }
+      .tags, .two, .one, .docs { grid-template-columns: minmax(0, 1fr); }
+      .tags { grid-template-columns: 1fr 1fr; }
+      .one .shaft { height: 280px; }
+      .side { position: static; display: flex; flex-wrap: wrap; gap: 4px 8px; }
+      .side b { width: 100%; margin: 8px 0 0; }
+      .side a { border-left: 0; padding: 4px 8px; }
+      .layer { grid-template-columns: 70px minmax(0, 1fr); }
+      .layer ul { grid-column: 1 / -1; }
+      .foot { grid-template-columns: 1fr 1fr; }
+      .strata > div { padding: 14px 24px; }
+    }
+    @media (max-width: 600px) {
+      .in { padding: 0 16px; }
+      .shafts { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+      .shafts > :nth-child(n+3) { display: none; }
+      .board { grid-template-columns: 1fr 1fr; gap: 24px 12px; }
+      .shaft { height: 240px; }
+      @keyframes pop { to { bottom: 176px; transform: translateX(-50%) rotate(8deg); } }
+      .depth { display: none; }
+      .tags, .row2 { grid-template-columns: minmax(0, 1fr); }
+      .tunnel { padding-left: 0; }
+      .tunnel::before { display: none; }
+      .tunnel .d { position: static; display: inline-block; width: auto; padding: 4px 10px; margin-bottom: 10px; }
+      .strata > div { padding: 12px 16px; gap: 12px; }
+      .strata em { width: 74px; font-size: 10px; }
+      .strata b { font-size: 26px; min-width: 52px; }
+      .note-book { padding: 24px 18px; box-shadow: 5px 5px 0 var(--deep); }
+      .kv { grid-template-columns: 104px minmax(0, 1fr); }
+      .sec { padding: 72px 0; }
+      .btn.hide-sm { display: none; }
+    }
+    @media (prefers-reduced-motion: reduce) { .shaft .hole, .shaft .flag { transition: none; } .shaft.up .bone { animation: none; bottom: 176px; } html { scroll-behavior: auto; } }
+  </style>
+</head>
+<body>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <symbol id="bone" viewBox="0 0 100 40"><path d="M16 20H84" stroke="#f4ead6" stroke-width="15" stroke-linecap="round"/><circle cx="14" cy="12" r="10" fill="#f4ead6"/><circle cx="14" cy="28" r="10" fill="#f4ead6"/><circle cx="86" cy="12" r="10" fill="#f4ead6"/><circle cx="86" cy="28" r="10" fill="#f4ead6"/></symbol>
+      <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="i-dot" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+      <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 4.500-3.400 8-8 9-4.600-1-8-4.500-8-9V6z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M8.500 12l2.500 2.500 4.500-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></symbol>
+    </defs>
+  </svg>
+
+  <div class="bar">
+    <a class="brand" href="#/"><img src="avatar.png" alt="">DIGGD</a>
+    <button class="btn sm" id="bar-sign">Connect</button>
+    <button class="btn sm" id="burger" aria-label="Menu"><svg class="i"><use href="#i-menu"/></svg></button>
+  </div>
+  <aside class="rail" id="rail">
+    <a class="brand" href="#/"><img src="avatar.png" alt="">DIGGD</a>
+    <nav class="menu" id="menu">
+      <a href="#/" data-nav="home"><small>0 ft</small>Surface</a>
+      <a href="#/yard" data-nav="yard"><small>1 ft</small>The yard</a>
+      <a href="#/bury" data-nav="bury"><small>2 ft</small>Bury a bone</a>
+      <a href="#/me" data-nav="me"><small>3 ft</small>Your bones</a>
+      <a href="#/agents" data-nav="agents"><small>4 ft</small>For agents</a>
+      <a href="#/token" data-nav="token"><small>5 ft</small>$DIGGD</a>
+      <a href="#/docs/introduction" data-nav="docs"><small>6 ft</small>Docs</a>
+    </nav>
+    <div class="rail-foot">
+      <button class="btn sm" id="nav-sign">Connect wallet</button>
+      <span class="mono">Six feet under until the chart digs.</span>
+    </div>
+  </aside>
+
+  <main>
+    <!-- ================= HOME ================= -->
+    <section class="page on" data-page="home">
+      <div class="sky"><div class="in hero">
+        <p class="eyebrow">Sealed messages · Solana</p>
+        <h1>Buried now.<br><em>Dug up at 1M.</em></h1>
+        <p class="lede">Bury the roadmap, the next CA or the confession. It stays six feet under until your token hits its market cap or the date arrives. The hash goes on-chain the moment you bury it, so not a word can change.</p>
+        <div class="cta"><a class="btn hot" href="#/bury">Bury a bone</a><a class="btn ink" href="#/yard">See the yard</a></div>
+      </div></div>
+      <div class="grass"></div>
+      <div class="yard">
+        <div class="depth" aria-hidden="true"><span>0 ft</span><span>2 ft</span><span>4 ft</span><span>6 ft</span></div>
+        <div class="in"><div class="shafts" id="home-yard"></div></div>
+      </div>
+      <div class="strata">
+        <div><em>Topsoil</em><b id="st-buried">—</b>still buried</div>
+        <div><em>Clay</em><b id="st-dug">—</b>dug up</div>
+        <div><em>Gravel</em><b id="st-tokens">—</b>tokens</div>
+        <div><em>Bedrock</em><b id="st-authors">—</b>authors</div>
+      </div>
+
+      <section class="soil sec"><div class="in">
+        <p class="label">How it works</p>
+        <h2>Bury. Pump. Dig.</h2>
+        <div class="tunnel">
+          <article><span class="d">0 FT</span><h3>Bury it</h3><p>Write your message and pick a token and a market cap, a date, or both. Your wallet signs a memo with the hash, so the text and its conditions are fixed on Solana.</p></article>
+          <article><span class="d">3 FT</span><h3>Watch the hole</h3><p>DIGGD checks the market cap every 2 minutes. As the token climbs, the hole goes deeper. Everyone sees how close the dig is to the bone. Nobody reads a word.</p></article>
+          <article><span class="d">6 FT</span><h3>It comes up by itself</h3><p>When the target holds for two checks in a row, or the date arrives, the bone is dug up. Anyone can compare the text with the hash on-chain.</p></article>
+        </div>
+      </div></section>
+
+      <section class="sky sec"><div class="in">
+        <p class="label">What to bury</p>
+        <h2>Worth digging for</h2>
+        <div class="tags">
+          <div class="dtag"><h3>The next CA</h3><p>Your next launch. Holders of this one find it first.</p></div>
+          <div class="dtag"><h3>The real roadmap</h3><p>Prove you had a plan before the chart moved.</p></div>
+          <div class="dtag"><h3>A dev reveal</h3><p>Who is behind the token, at the market cap you promised.</p></div>
+          <div class="dtag"><h3>A call</h3><p>Bury your prediction today. No deleted tweets.</p></div>
+          <div class="dtag"><h3>A giveaway</h3><p>The winning wallet or claim link, under until the target hits.</p></div>
+          <div class="dtag"><h3>A time capsule</h3><p>No token needed. Write to the future and pick a date.</p></div>
+        </div>
+      </div></section>
+      <section class="final"><div class="in">
+        <h2>Give them a reason to dig.</h2>
+        <div class="cta" style="margin:0"><a class="btn ink" href="#/bury">Bury a bone</a><a class="btn ink" href="#/agents">Connect an agent</a></div>
+      </div></section>
+    </section>
+
+    <!-- ================= YARD ================= -->
+    <section class="page" data-page="yard">
+      <div class="in pagehead"><p class="label">The yard</p><h1>What is buried</h1><p class="sub">Every bone, sorted by how close the dig is. The deeper the hole, the closer the token is to its target.</p></div>
+      <div class="in">
+        <div class="filter">
+          <div class="tabs" role="tablist" id="board-tabs">
+            <button class="tab" data-s="buried" aria-selected="true">Buried</button>
+            <button class="tab" data-s="dug" aria-selected="false">Dug up</button>
+            <button class="tab" data-s="all" aria-selected="false">All</button>
+          </div>
+          <input id="board-mint" placeholder="Filter by token mint" aria-label="Filter by token mint">
+        </div>
+        <div class="board" id="board"></div>
+      </div>
+    </section>
+
+    <!-- ================= ONE BONE ================= -->
+    <section class="page" data-page="b">
+      <div class="in" id="one"></div>
+    </section>
+
+    <!-- ================= BURY ================= -->
+    <section class="page" data-page="bury">
+      <div class="in pagehead"><p class="label">Bury a bone</p><h1>Dig a hole</h1><p class="sub">Once buried, a bone cannot be edited. Write it carefully: the hash in your transaction fixes every character.</p></div>
+      <div class="in">
+        <form class="form note-book" id="bury-form">
+          <div class="field"><label for="f-teaser">Public teaser</label><input id="f-teaser" maxlength="100" placeholder="What happens at 1M" required><small>Everyone sees this line while the bone is buried.</small></div>
+          <div class="field"><label for="f-body">Buried message</label><textarea id="f-body" maxlength="2000" placeholder="Hidden until it is dug up. Up to 2000 characters." required></textarea></div>
+          <div class="field"><label for="f-mint">Token mint</label><input id="f-mint" placeholder="Leave empty for a date-only bone" autocomplete="off"><small id="f-token">Any Solana token Jupiter lists. If your wallet created it on pump.fun, the bone gets a Creator badge.</small></div>
+          <div class="row2">
+            <div class="field"><label for="f-target">Dug up at market cap, USD</label><input id="f-target" type="number" step="1000" min="5000" placeholder="1000000"><div class="presets" id="f-presets"></div></div>
+            <div class="field"><label for="f-date">Or on this date</label><input id="f-date" type="datetime-local"><small>Set both and whichever comes first digs it up.</small></div>
+          </div>
+          <p class="callout" id="bury-burn-note" hidden>Burying burns <b class="bury-burn">50,000</b> $DIGGD. Phantom shows the burn before you approve it.</p>
+          <div><button class="btn hot" type="submit" id="bury-btn">Connect and bury</button></div>
+          <p class="status" id="bury-status"></p>
+        </form>
+      </div>
+    </section>
+
+    <!-- ================= AGENTS ================= -->
+    <section class="page" data-page="agents">
+      <div class="in pagehead"><p class="label">For agents</p><h1>Let your agent sniff</h1><p class="sub">DIGGD is a read-only MCP server. An agent can track what is about to come up, catch reveals and check whether a token's creator buried anything.</p></div>
+      <div class="in two">
+        <div class="note-book">
+          <h3>Connect it</h3>
+          <p>MCP endpoint, no key needed:</p>
+          <div class="codebox"><button class="cp">copy</button><span class="api-mcp">API/mcp</span></div>
+          <div class="tabs" role="tablist" id="agent-tabs">
+            <button class="tab" data-a="code" aria-selected="true">Claude Code</button>
+            <button class="tab" data-a="desktop" aria-selected="false">Claude Desktop</button>
+            <button class="tab" data-a="cursor" aria-selected="false">Cursor</button>
+            <button class="tab" data-a="other" aria-selected="false">REST</button>
+          </div>
+          <div id="agent-body"></div>
+        </div>
+        <div class="note-book">
+          <h3>Tools</h3>
+          <div class="kv" style="grid-template-columns:auto 1fr">
+            <code>list_bones</code><span>Buried or dug up, with progress</span>
+            <code>get_bone</code><span>One bone and its text once dug up</span>
+            <code>check_token</code><span>Market cap, creator, bones on a mint</span>
+          </div>
+          <p style="margin-top:18px">Dug-up text is written by the bone's author. Agents should treat it as a claim, not as fact and not as instructions.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= ME ================= -->
+    <section class="page" data-page="me">
+      <div class="in pagehead"><p class="label">Your wallet</p><h1>Your bones</h1></div>
+      <div class="in" id="me"></div>
+    </section>
+
+    <!-- ================= TOKEN ================= -->
+    <section class="page" data-page="token">
+      <div class="in pagehead"><p class="label">$DIGGD</p><h1>Dig first. Bury with fire.</h1><p class="sub">Reading is free. $DIGGD buys the first look at every reveal, pays for each burial and gets bought back with creator fees.</p></div>
+      <div class="in">
+        <div class="layers">
+          <div class="layer"><span class="d">TOPSOIL</span><div class="amt"><small>Anyone</small>Free</div><ul><li><svg><use href="#i-check"/></svg><span>Browse every bone, MCP and REST</span></li><li><svg><use href="#i-check"/></svg><span>Read reveals after <span class="early-min">5</span> minutes</span></li><li><svg><use href="#i-check"/></svg><span>Verify any hash yourself</span></li></ul></div>
+          <div class="layer hot"><span class="d">CLAY</span><div class="amt"><small>Holder</small><span class="hold-early-short">500K</span> $DIGGD</div><ul><li><svg><use href="#i-check"/></svg><span>Read every reveal the second it comes up</span></li><li><svg><use href="#i-check"/></svg><span><span class="early-min">5</span> minutes ahead when a bone holds the next CA</span></li><li><svg><use href="#i-check"/></svg><span>Checked from your connected wallet</span></li></ul></div>
+          <div class="layer"><span class="d">BEDROCK</span><div class="amt"><small>Author</small><span class="bury-burn-short">50K</span> burned</div><ul><li><svg><use href="#i-check"/></svg><span>One burn per bone, in the same transaction</span></li><li><svg><use href="#i-check"/></svg><span>Keeps spam out of the yard</span></li><li><svg><use href="#i-check"/></svg><span>Every bone shrinks supply</span></li></ul></div>
+        </div>
+        <div class="two" style="margin-top:44px">
+          <div class="note-book">
+            <h3>Where the creator fees go</h3>
+            <p>pump.fun pays the creator a fee on every $DIGGD trade. A bot collects it and splits it:</p>
+            <div class="split"><div style="flex:7;background:var(--rust);color:#fff">70% buy back &amp; burn</div><div style="flex:3;background:var(--ink);color:var(--bone)">30% servers</div></div>
+            <p class="fine">Every buyback is a public transaction.</p>
+          </div>
+          <div class="note-book">
+            <h3>Mint address</h3>
+            <div class="ca" id="ca">The mint address appears here at launch. Until then, any token using this name is not ours.</div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px" id="token-links"></div>
+            <p class="fine">Fair launch on pump.fun. No presale, no team allocation.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= ROADMAP ================= -->
+    <section class="page" data-page="roadmap">
+      <div class="in pagehead"><p class="label">Roadmap</p><h1>The dig log</h1></div>
+      <div class="in log">
+        <article class="now"><span class="ph">Phase 1 · Live</span><h3>The bone</h3><ul><li>Market cap and date triggers</li><li>Hash sealed on-chain in a memo</li><li>Creator badge</li><li>MCP server and REST API</li><li>Holders read first, burn to bury</li></ul></article>
+        <article><span class="ph">Phase 2 · Next</span><h3>Reach</h3><ul><li>Live dig badge for your site</li><li>Share cards for every bone</li><li>Telegram alerts when a bone comes up</li></ul></article>
+        <article><span class="ph">Phase 3</span><h3>Deeper holes</h3><ul><li>Several reveals in one hole, one per milestone</li><li>Triggers on holder count and graduation</li><li>Holder-only bones</li></ul></article>
+        <article><span class="ph">Phase 4</span><h3>No key at all</h3><ul><li>Time-lock encryption for date bones</li><li>Key shares split across keepers</li><li>A buried text nobody can read early</li></ul></article>
+      </div>
+    </section>
+
+    <!-- ================= DOCS ================= -->
+    <section class="page" data-page="docs">
+      <div class="in docs">
+        <aside class="side" id="side"></aside>
+        <article class="doc note-book"><div id="doc-body"></div></article>
+      </div>
+      <div hidden id="doc-src">
+        <section data-slug="introduction" data-group="Getting started" data-title="Introduction">
+          <p>DIGGD buries a message on Solana and digs it up when a token reaches a market cap, when a date arrives, or whichever comes first.</p>
+          <p>While a bone is buried, everyone sees its teaser, its token, its target and how deep the dig has gone. Nobody sees the text. When it comes up, anyone can read it and check it against the hash written on-chain when it was buried.</p>
+          <h2>Lifecycle</h2>
+          <ul><li><b>buried:</b> sealed, waiting for its target or date.</li><li><b>dug:</b> the target held for two checks in a row, or the date arrived.</li></ul>
+          <p>Bones cannot be edited or dug up early by their author. Check the conditions before you bury.</p>
+        </section>
+        <section data-slug="burying" data-group="Getting started" data-title="Burying a bone">
+          <ol><li>Open <a href="#/bury">Bury a bone</a> and write a public teaser and the buried message.</li><li>Paste a token mint and set a market cap, a date, or both. The target has to be at least 10% above the current market cap and at least <span class="min-target">$5,000</span>.</li><li>Phantom asks you to approve one transaction. It writes the hash in a memo and costs a normal network fee. After the $DIGGD launch it also burns <b class="bury-burn">50,000</b> $DIGGD.</li><li>Your bone goes into the yard with its own link. Share it.</li></ol>
+          <p>If your wallet is the pump.fun creator of the token, the bone gets a <b>Creator</b> badge. Anyone else can bury on any token, without the badge.</p>
+        </section>
+        <section data-slug="verifying" data-group="Getting started" data-title="Verifying a bone">
+          <p>The hash in the memo is the SHA-256 of these lines, joined with newlines:</p>
+          <div class="codebox"><code>diggd-v1
+salt
+mint (empty for none)
+target in USD (0 for none)
+date in milliseconds (0 for none)
+message</code></div>
+          <p>The salt stays secret until the bone comes up, so short messages cannot be guessed from the hash. Open a dug-up bone and the site recomputes the hash in your browser. You can also do it yourself and compare it with the memo on Solscan.</p>
+        </section>
+        <section data-slug="mcp" data-group="Reference" data-title="MCP server">
+          <p>Endpoint (streamable HTTP, JSON-RPC over POST). No key needed:</p>
+          <div class="codebox"><span class="api-mcp">API/mcp</span></div>
+          <h2>Tools</h2>
+          <ul><li><code>list_bones { status?: "buried" | "dug" | "all", mint?, limit? }</code></li><li><code>get_bone { id }</code></li><li><code>check_token { mint }</code></li></ul>
+        </section>
+        <section data-slug="rest-api" data-group="Reference" data-title="REST API">
+          <ul><li><code>GET /v1/bones?status=buried|dug|all&amp;mint=&amp;limit=50</code></li><li><code>GET /v1/bones/:id</code></li><li><code>GET /v1/token/:mint</code></li><li><code>POST /v1/bones { teaser, body, salt, mint?, targetUsd?, openAt?, tx }</code></li><li><code>GET /v1/me</code>, <code>GET /v1/stats</code></li></ul>
+          <p>Errors come back as <code>{ "error": "…" }</code> with a 4xx status.</p>
+          <div class="codebox"><span class="api-curl">curl API/v1/bones?status=dug</span></div>
+        </section>
+        <section data-slug="trust" data-group="Trust" data-title="Trust model">
+          <p>Here is exactly what you are trusting.</p>
+          <h2>What nobody can do</h2>
+          <ul><li><b>Change a bone.</b> The text, the token, the target and the date are bound to the hash on Solana. A changed bone fails the check.</li><li><b>Backdate a bone.</b> The memo's block time proves when it was buried.</li></ul>
+          <h2>What you trust DIGGD with</h2>
+          <ul><li><b>Keeping it under.</b> Text is encrypted in the database, but the server holds the key, because it has to dig bones up by itself. It could technically read a buried bone. Do not bury anything that would hurt you if it leaked.</li><li><b>Digging it up.</b> The digger runs on our server and reads market caps from Jupiter. If either is down, the dig waits.</li><li><b>Keeping it up.</b> If the service shut down, buried text would be lost. The hash would stay on-chain.</li></ul>
+          <p>DIGGD can take a bone out of the yard if it is abusive or dangerous. The hash stays on-chain. Phase 4 moves to encryption that needs no trusted key.</p>
+          <h2>Reading bones safely</h2>
+          <ul><li>A bone is only what its author wrote. An on-chain seal proves when it was written, not that it is true.</li><li>A <b>Creator</b> badge means the pump.fun creator wallet signed it. It says nothing about whether the token is safe.</li><li>Be careful with any link or address in a dug-up bone. Never connect a wallet to a site just because a bone told you to.</li></ul>
+        </section>
+        <section data-slug="faq" data-group="Trust" data-title="FAQ">
+          <h2>Can a wick dig up a bone?</h2><p>The market cap has to stay at or above the target for two checks in a row, about 2 to 4 minutes. A single spike resets the count. A bone can still come up on a pump that holds for a few minutes and then fades.</p>
+          <h2>What if the token never gets there?</h2><p>The bone stays buried for good, unless you also set a date.</p>
+          <h2>Can I dig up my own bone early?</h2><p>No. You can read it from your wallet, but it stays buried for everyone else.</p>
+          <h2>Why does a holder read first?</h2><p>When a bone comes up, holders of <span class="hold-early">500,000</span> $DIGGD can read it right away. Everyone else waits <span class="early-min">5</span> minutes.</p>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="in foot">
+      <div><a class="logo" href="#/" style="text-decoration:none"><img src="avatar.png" alt="">DIGGD</a><p style="color:var(--muted);font-size:14.5px;margin-top:10px">Buried until the chart digs it up.</p></div>
+      <div><b>Dig</b><a href="#/yard">The yard</a><a href="#/bury">Bury a bone</a><a href="#/me">Your bones</a></div>
+      <div><b>Build</b><a href="#/agents">For agents</a><a href="#/docs/mcp">MCP server</a><a href="#/docs/rest-api">REST API</a><a href="#/docs/trust">Trust model</a></div>
+      <div><b>Pack</b><span id="foot-links"></span><a href="#/token">$DIGGD</a></div>
+    </div>
+    <div class="in legal">DIGGD stores and digs up messages written by its users. It does not check them and does not endorse any token or claim. Nothing here is financial advice. Not affiliated with pump.fun, Solana, Jupiter, Phantom, Anthropic or Cursor.</div>
+  </footer>
+  <div class="toast" id="toast"></div>
+
+  <script>
+  (() => { // own scope: wallet extensions define globals like window.phantom
+    // ===== Settings: fill these in and re-upload this one file =====
+    const CONFIG = {
+      api: location.hostname === 'localhost' ? 'http://localhost:8801' : 'https://diggd-api.orchard-api.workers.dev', // DIGGD API worker (local: node worker/dev.mjs)
+      mint: '', // $DIGGD mint
+      x: 'https://x.com/diggd_sol',
+      github: '',
+      buryBurn: 50000,   // must match BURY_BURN on the worker
+      holdEarly: 500000, // must match HOLD_EARLY
+      earlyMin: 5,       // must match EARLY_MIN
+      minTarget: 5000,   // must match MIN_TARGET_USD
+    };
+    // ===============================================================
+
+    const $ = (id) => document.getElementById(id);
+    const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+    const short = (a) => (a ? a.slice(0, 4) + '…' + a.slice(-4) : '');
+    const kshort = (n) => (n >= 1e6 ? n / 1e6 + 'M' : n >= 1e3 ? n / 1e3 + 'K' : String(n));
+    const money = (n) => { n = Number(n) || 0; return '$' + (n >= 1e9 ? +(n / 1e9).toFixed(2) + 'B' : n >= 1e6 ? +(n / 1e6).toFixed(2) + 'M' : n >= 1e3 ? +(n / 1e3).toFixed(1) + 'K' : Math.round(n)); };
+    function toast(t) { $('toast').textContent = t; $('toast').classList.add('on'); clearTimeout(window._t); window._t = setTimeout(() => $('toast').classList.remove('on'), 2800); }
+    const store = { get(k) { try { return localStorage.getItem(k); } catch { return null; } }, set(k, v) { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch {} } };
+    const sha256hex = async (s) => [...new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s)))].map((b) => b.toString(16).padStart(2, '0')).join('');
+    const commitOf = ({ salt, mint, target, openAt, body }) => sha256hex(`diggd-v1\n${salt}\n${mint || ''}\n${target || 0}\n${openAt || 0}\n${body}`);
+
+    // ---------- API ----------
+    let session = store.get('diggd.session'), me = null;
+    try { me = JSON.parse(store.get('diggd.me') || 'null'); } catch {}
+    async function api(path, init = {}) {
+      const headers = { 'content-type': 'application/json', ...(session ? { authorization: 'Bearer ' + session } : {}) };
+      const res = await fetch(CONFIG.api + path, { ...init, headers });
+      const j = await res.json().catch(() => ({}));
+      if (res.status === 401 && session) signOut();
+      if (!res.ok) { const e = new Error(j.error || 'Request failed'); e.status = res.status; throw e; }
+      return j;
+    }
+    const rpc = async (method, params) => { const j = await (await fetch(`${CONFIG.api}/v1/rpc`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ jsonrpc: '2.0', id: 1, method, params }) })).json(); if (j.error) throw new Error(j.error.message); return j.result; };
+
+    // ---------- wallet ----------
+    const B58 = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
+    function b58enc(bytes) { let n = 0n; for (const b of bytes) n = (n << 8n) + BigInt(b); let s = ''; while (n > 0n) { s = B58[Number(n % 58n)] + s; n /= 58n; } for (const b of bytes) { if (b) break; s = '1' + s; } return s; }
+    function b58dec(s) { let n = 0n; for (const c of s) n = n * 58n + BigInt(B58.indexOf(c)); const out = []; while (n > 0n) { out.unshift(Number(n & 255n)); n >>= 8n; } for (const c of s) { if (c !== '1') break; out.unshift(0); } return Uint8Array.from(out); }
+    const u64le = (v) => { const b = new Uint8Array(8); new DataView(b.buffer).setBigUint64(0, v, true); return b; };
+    const cat = (...parts) => { const out = new Uint8Array(parts.reduce((t, p) => t + p.length, 0)); let o = 0; for (const p of parts) { out.set(p, o); o += p.length; } return out; };
+    const MEMO = 'MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr';
+    // one memo instruction signed by the owner; the signer is account 0 and the memo program comes last
+    function memoMessage(owner, text, blockhash) {
+      const data = new TextEncoder().encode(text);
+      return cat(Uint8Array.of(1, 0, 1, 2), b58dec(owner), b58dec(MEMO), b58dec(blockhash), Uint8Array.of(1, 1, 1, 0, data.length), data);
+    }
+    // memo plus SPL BurnChecked (instruction 15) in one transaction: accounts [owner (signer), token account (w), mint (w), token program, memo program]
+    function burnMemoMessage(owner, text, tokenAccount, mint, program, amount, decimals, blockhash) {
+      const keys = [owner, tokenAccount, mint, program, MEMO].map(b58dec);
+      const memo = new TextEncoder().encode(text), burn = cat(Uint8Array.of(15), u64le(amount), Uint8Array.of(decimals));
+      return cat(Uint8Array.of(1, 0, 2), Uint8Array.of(keys.length), ...keys, b58dec(blockhash), Uint8Array.of(2), Uint8Array.of(4, 1, 0, memo.length), memo, Uint8Array.of(3, 3, 1, 2, 0, burn.length), burn);
+    }
+    const getPhantom = () => window.phantom?.solana || (window.solana?.isPhantom ? window.solana : null);
+    async function connect() {
+      const p = getPhantom();
+      if (!p) { toast('Phantom not found. Open this page in Phantom or install it.'); return null; }
+      return (await p.connect()).publicKey.toString();
+    }
+    async function signIn() {
+      if (session && me) return me;
+      const address = await connect();
+      if (!address) return null;
+      const message = `DIGGD sign-in\nWallet: ${address}\nTime: ${new Date().toISOString()}`;
+      const { signature } = await getPhantom().signMessage(new TextEncoder().encode(message), 'utf8');
+      const r = await (await fetch(`${CONFIG.api}/v1/auth`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ address, message, signature: b58enc(signature) }) })).json();
+      if (!r.session) { toast(r.error || 'Sign-in failed.'); return null; }
+      session = r.session; me = { wallet: address };
+      store.set('diggd.session', session); store.set('diggd.me', JSON.stringify(me));
+      paintWho();
+      return me;
+    }
+    function signOut() { session = null; me = null; store.set('diggd.session', null); store.set('diggd.me', null); paintWho(); }
+    function paintWho() { for (const id of ['nav-sign', 'bar-sign']) { $(id).textContent = me ? short(me.wallet) : id === 'bar-sign' ? 'Connect' : 'Connect wallet'; $(id).classList.toggle('who', !!me); } }
+    async function confirmTx(signature) {
+      for (let i = 0; i < 40; i++) {
+        await new Promise((r) => setTimeout(r, 2000));
+        const st = (await rpc('getSignatureStatuses', [[signature]])).value[0];
+        if (st?.err) throw new Error('the transaction failed on-chain');
+        if (st && (st.confirmationStatus === 'confirmed' || st.confirmationStatus === 'finalized')) return;
+      }
+      throw new Error('not confirmed yet; check your wallet and try again');
+    }
+    // Phantom wants a whole unsigned transaction (1 empty signature slot + message), not the bare message
+    async function send(message) { const { signature } = await getPhantom().request({ method: 'signAndSendTransaction', params: { message: b58enc(cat(Uint8Array.of(1), new Uint8Array(64), message)) } }); return signature; }
+
+    // ---------- shafts ----------
+    // the hole is the progress bar: it is dug from the surface down to the bone; 6 ft = the target
+    const shaftHtml = (p, flag = '') => `<div class="shaft" data-p="${p}"><div class="hole"></div><div class="flag">${flag}</div><svg class="bone" viewBox="0 0 100 40"><use href="#bone"/></svg><span class="ft">${feet(p)}</span><div class="found"></div></div>`;
+    const feet = (p) => p >= 1 ? 'found' : (6 * (1 - p)).toFixed(1) + ' ft to go';
+    // the hole stops just above the bone; the flag rides at the bottom of the hole
+    function paintShaft(el, p) {
+      const H = el.clientHeight || 300, reach = H - 20 - 26;
+      el.querySelector('.hole').style.height = Math.round(p * reach) + 'px';
+      el.querySelector('.flag').style.top = Math.max(0, Math.round(p * reach) - 2) + 'px';
+      el.querySelector('.ft').textContent = feet(p);
+      el.dataset.now = p;
+    }
+    function digAll(root) { requestAnimationFrame(() => requestAnimationFrame(() => root.querySelectorAll('.shaft[data-p]').forEach((el) => paintShaft(el, Number(el.dataset.p))))); }
+    function goal(w) {
+      if (w.targetUsd) return `dug up at <b>${money(w.targetUsd)}</b>`;
+      return `dug up <b>${new Date(w.openAt).toLocaleDateString()}</b>`;
+    }
+    const flagOf = (w) => (w.targetUsd && w.token?.mcap != null ? money(w.token.mcap) : Math.round(w.progress * 100) + '%');
+    function plot(w) {
+      const dug = w.status === 'dug';
+      const inner = dug ? `<div class="paper">${w.body != null ? esc(w.body) : 'Holders read first. Public in a few minutes.'}</div>` : shaftHtml(w.progress, flagOf(w));
+      return `<a class="plot ${dug ? 'dug' : ''}" href="#/b/${w.id}">${inner}
+        <div class="tag"><div class="chips"><span>${w.token?.symbol ? '$' + esc(w.token.symbol) : 'Capsule'}</span><span class="pill ${w.status}">${dug ? 'Dug up' : 'Buried'}</span>${w.creatorBone ? '<span class="pill dev">Creator</span>' : ''}</div><b>${esc(w.teaser)}</b><span>${goal(w).replace(/<\/?b>/g, '')}</span></div></a>`;
+    }
+    const emptyBoard = (t) => `<div class="empty">${t} <a href="#/bury">Bury the first one</a>.</div>`;
+
+    // the home example: a dig that reaches its target on a loop; no data-p, so digAll leaves it alone
+    let demoT = 0;
+    function demoPlot() {
+      return `<div class="plot demo">${shaftHtml(0).replace(' data-p="0"', '')}<div class="tag"><div class="chips"><span>$EXAMPLE</span><span class="pill buried">Example</span></div><b>What happens at 1M</b><span id="demo-cap">$40K → $1M</span></div></div>`;
+    }
+    function startDemo() {
+      const el = document.querySelector('#home-yard .demo .shaft');
+      if (!el) return;
+      el.querySelector('.found').textContent = 'Next launch goes live at 2M. The roadmap was real.';
+      const paint = (p) => {
+        el.querySelector('.hole').style.transition = 'none'; el.querySelector('.flag').style.transition = 'none';
+        paintShaft(el, p);
+        el.querySelector('.flag').textContent = money(40000 + p * 960000);
+        el.classList.toggle('up', p >= 1);
+      };
+      if (matchMedia('(prefers-reduced-motion: reduce)').matches) { paint(.62); return; }
+      let p = 0;
+      clearInterval(demoT);
+      demoT = setInterval(() => { p = p >= 1.4 ? 0 : p + .005; paint(Math.min(1, p)); }, 50);
+    }
+
+    async function loadHome() {
+      $('home-yard').innerHTML = demoPlot();
+      startDemo();
+      try { const s = await api('/v1/stats'); $('st-buried').textContent = s.buried; $('st-dug').textContent = s.dug; $('st-tokens').textContent = s.tokens; $('st-authors').textContent = s.authors; } catch {}
+      try {
+        const { bones } = await api('/v1/bones?limit=4');
+        $('home-yard').insertAdjacentHTML('beforeend', bones.map(plot).join(''));
+        digAll($('home-yard'));
+      } catch {}
+    }
+    let boardStatus = 'buried';
+    async function loadBoard() {
+      document.querySelectorAll('#board-tabs .tab').forEach((t) => t.setAttribute('aria-selected', t.dataset.s === boardStatus));
+      $('board').innerHTML = '<p class="fine">Sniffing the yard…</p>';
+      const mint = $('board-mint').value.trim();
+      try {
+        const { bones } = await api(`/v1/bones?status=${boardStatus}&limit=100${mint ? '&mint=' + encodeURIComponent(mint) : ''}`);
+        $('board').innerHTML = bones.length ? bones.map(plot).join('') : emptyBoard('Nothing here yet.');
+        digAll($('board'));
+      } catch (e) { $('board').innerHTML = `<div class="empty">${esc(e.message)}</div>`; }
+    }
+
+    // ---------- one bone ----------
+    async function loadBone(id) {
+      $('one').innerHTML = '<p class="fine" style="padding-top:56px">Digging…</p>';
+      let w;
+      try { w = await api('/v1/bones/' + id); }
+      catch (e) { $('one').innerHTML = `<div class="empty" style="margin-top:56px">${esc(e.message)}</div>`; return; }
+      document.title = `${w.teaser} · DIGGD`;
+      const dug = w.status === 'dug';
+      const share = `https://x.com/intent/tweet?text=${encodeURIComponent(`${dug ? 'Dug up' : 'Buried'}: ${w.teaser}${w.token?.symbol ? ` $${w.token.symbol}` : ''}`)}&url=${encodeURIComponent(location.href)}`;
+      const read = w.body != null;
+      const left = dug ? `<div class="shaft up" data-p="1" style="background:linear-gradient(180deg,var(--s1) 0 34%,var(--s2) 34% 68%,#36200f 68%)"><div class="hole"></div><div class="flag">${flagOf(w)}</div><svg class="bone" viewBox="0 0 100 40"><use href="#bone"/></svg><span class="ft">found</span><div class="found" style="opacity:1">Dug up ${w.openedAt ? new Date(w.openedAt).toLocaleDateString() : ''}</div></div>` : shaftHtml(w.progress, flagOf(w));
+      const text = read
+        ? `<div class="note-book"><h3>${dug ? 'What was buried' : 'Your buried message'}</h3><p style="white-space:pre-wrap;overflow-wrap:anywhere;color:var(--ink);font-size:17px">${esc(w.body)}</p>${dug ? '<div class="verified" id="verify">Checking the hash…</div>' : '<p class="fine">Only your wallet sees this until it is dug up.</p>'}</div>`
+        : dug ? `<div class="note-book gate"><h3>Dug up. Holders read first.</h3><p>Everyone else can read it at ${new Date(w.publicAt).toLocaleTimeString()}.</p><div class="cta" style="justify-content:center;margin-top:18px"><a class="btn hot" href="#/token">Get $DIGGD</a><button class="btn" id="one-sign">Connect wallet</button></div></div>`
+        : '';
+      $('one').innerHTML = `<div class="one"><div>${left}</div><div>
+          <div class="chips"><span>Bone #${w.id}</span><span class="pill ${w.status}">${dug ? 'Dug up' : 'Buried'}</span>${w.creatorBone ? '<span class="pill dev">Creator</span>' : ''}</div>
+          <h1>${esc(w.teaser)}</h1>
+          <div class="meter"><span>${dug ? 'found' : (w.targetUsd ? flagOf(w) + ' · ' : '') + Math.round(w.progress * 100) + '% dug'}</span><span>${goal(w)}</span></div>
+          <div class="cta" style="margin-top:18px;margin-bottom:28px"><a class="btn hot sm" href="${share}" target="_blank" rel="noopener">Share on X</a><button class="btn sm" id="copy-link">Copy link</button></div>
+          ${text}
+          <div class="note-book" style="margin-top:26px"><h3>The proof</h3><div class="kv">
+          ${w.token ? `<span>Token</span><b><a href="#/yard" data-mint="${esc(w.token.mint)}">${w.token.symbol ? '$' + esc(w.token.symbol) : short(w.token.mint)}</a></b><span>Market cap</span><b>${w.token.mcap != null ? money(w.token.mcap) : '—'}</b>` : ''}
+          ${w.targetUsd ? `<span>Target</span><b>${money(w.targetUsd)}</b><span>Buried at</span><b>${money(w.startMcap)}</b>` : ''}
+          ${w.openAt ? `<span>Date</span><b>${new Date(w.openAt).toLocaleString()}</b>` : ''}
+          <span>Author</span><b><a href="https://solscan.io/account/${w.author}" target="_blank" rel="noopener">${short(w.author)}</a></b>
+          <span>Buried</span><b>${new Date(w.created).toLocaleString()}</b>
+          ${w.openedAt ? `<span>Dug up</span><b>${new Date(w.openedAt).toLocaleString()}</b>` : ''}
+          <span>Transaction</span><b><a href="https://solscan.io/tx/${w.tx}" target="_blank" rel="noopener">${short(w.tx)}</a></b>
+          <span>Hash</span><b>${w.commit.slice(0, 16)}…</b>
+        </div><p class="fine">An on-chain seal proves when this was written, not that it is true. <a href="#/docs/trust">Trust model</a></p></div></div></div>`;
+      if (!dug) digAll($('one'));
+      $('copy-link').onclick = () => navigator.clipboard.writeText(location.href).then(() => toast('Link copied.'));
+      $('one-sign') && ($('one-sign').onclick = async () => { try { if (await signIn()) loadBone(id); } catch {} });
+      $('one').querySelector('[data-mint]')?.addEventListener('click', (e) => { $('board-mint').value = e.currentTarget.dataset.mint; boardStatus = 'all'; });
+      if (dug && read) {
+        const ok = (await commitOf({ salt: w.salt, mint: w.token?.mint, target: w.targetUsd, openAt: w.openAtMs, body: w.body })) === w.commit;
+        $('verify').className = 'verified' + (ok ? '' : ' bad');
+        $('verify').innerHTML = ok ? '<svg><use href="#i-shield"/></svg><span>Recomputed in your browser: this text and its conditions match the hash buried on-chain.</span>' : '<span>This text does not match the buried hash.</span>';
+      }
+    }
+
+    // ---------- burying ----------
+    let tokenInfo = null;
+    async function lookToken() {
+      const mint = $('f-mint').value.trim(), out = $('f-token');
+      tokenInfo = null; $('f-presets').innerHTML = ''; out.className = '';
+      if (!mint) { out.textContent = 'Any Solana token Jupiter lists. If your wallet created it on pump.fun, the bone gets a Creator badge.'; return; }
+      out.textContent = 'Looking it up…';
+      try {
+        const t = await api('/v1/token/' + encodeURIComponent(mint));
+        tokenInfo = t;
+        out.textContent = `$${t.symbol} · ${t.name} · market cap ${money(t.mcap)}`;
+        const floor = Math.max(t.mcap * 1.1, CONFIG.minTarget);
+        const steps = [2, 5, 10].map((x) => Math.max(t.mcap * x, floor)).map((v) => Math.ceil(v / 1000) * 1000);
+        $('f-presets').innerHTML = [...new Set(steps)].map((v) => `<button type="button" class="btn sm" data-v="${v}">${money(v)}</button>`).join('');
+      } catch (e) { out.className = 'bad'; out.textContent = e.message; }
+    }
+    async function buryBone(e) {
+      e.preventDefault();
+      const st = $('bury-status'); st.className = 'status';
+      try {
+        const teaser = $('f-teaser').value.trim();
+        const body = $('f-body').value.replace(/\r/g, '').trim();
+        const mint = $('f-mint').value.trim() || null;
+        const target = Math.round(Number($('f-target').value) || 0);
+        const openAt = $('f-date').value ? new Date($('f-date').value).getTime() : 0;
+        if (teaser.length < 3) throw new Error('Write a public teaser.');
+        if (!body) throw new Error('Write the buried message.');
+        if (!target && !openAt) throw new Error('Set a market cap, a date, or both.');
+        if (target && !mint) throw new Error('A market cap target needs a token mint.');
+        if (openAt && openAt < Date.now() + 10 * 60000) throw new Error('Pick a date at least 10 minutes from now.');
+        if (target && tokenInfo?.mint === mint && target < tokenInfo.mcap * 1.1) throw new Error(`The target has to be at least 10% above the market cap, now ${money(tokenInfo.mcap)}.`);
+        // a tab opened before the token launch would otherwise bury without the burn
+        const live = await api('/v1/stats');
+        if ((live.mint || '') !== CONFIG.mint || (live.buryBurn || 0) !== (CONFIG.mint ? CONFIG.buryBurn : 0)) throw new Error('This page is out of date. Reload it and try again. Nothing was sent.');
+        const owner = await connect();
+        if (!owner) return;
+        const salt = [...crypto.getRandomValues(new Uint8Array(16))].map((b) => b.toString(16).padStart(2, '0')).join('');
+        const memo = 'diggd:' + await commitOf({ salt, mint, target, openAt, body });
+        const { value: { blockhash } } = await rpc('getLatestBlockhash', [{ commitment: 'confirmed' }]);
+        let message = memoMessage(owner, memo, blockhash);
+        if (CONFIG.mint && CONFIG.buryBurn) {
+          st.textContent = 'Finding your $DIGGD…';
+          const accs = await rpc('getTokenAccountsByOwner', [owner, { mint: CONFIG.mint }, { encoding: 'jsonParsed' }]);
+          const acc = accs.value.sort((a, b) => Number(b.account.data.parsed.info.tokenAmount.amount) - Number(a.account.data.parsed.info.tokenAmount.amount))[0];
+          const decimals = acc?.account.data.parsed.info.tokenAmount.decimals ?? 6;
+          const amount = BigInt(CONFIG.buryBurn) * 10n ** BigInt(decimals);
+          if (!acc || BigInt(acc.account.data.parsed.info.tokenAmount.amount) < amount) throw new Error(`Burying burns ${CONFIG.buryBurn.toLocaleString('en-US')} $DIGGD. This wallet does not hold enough.`);
+          message = burnMemoMessage(owner, memo, acc.pubkey, CONFIG.mint, acc.account.owner, amount, decimals, blockhash);
+        }
+        st.textContent = 'Approve in Phantom…';
+        const tx = await send(message);
+        st.textContent = 'Burying on Solana…';
+        await confirmTx(tx);
+        const input = { teaser, body, salt, mint, targetUsd: target, openAt, tx };
+        let w;
+        for (let i = 0; i < 6 && !w; i++) {
+          try { w = await api('/v1/bones', { method: 'POST', body: JSON.stringify(input) }); }
+          catch (err) { if (err.status !== 404) throw err; await new Promise((r) => setTimeout(r, 3000)); }
+        }
+        if (!w) throw new Error(`Buried on-chain but not saved yet. Transaction ${tx}`);
+        $('bury-form').reset(); st.textContent = ''; tokenInfo = null; $('f-presets').innerHTML = '';
+        toast('Buried.'); location.hash = '#/b/' + w.id;
+      } catch (err) { st.className = 'status bad'; st.textContent = err.code === 4001 ? 'Cancelled.' : err.message; }
+    }
+
+    // ---------- agents, me ----------
+    const AGENT = {
+      code: () => `<div class="codebox"><button class="cp">copy</button>claude mcp add --transport http diggd ${CONFIG.api}/mcp</div>`,
+      desktop: () => `<ol style="margin-top:14px;color:var(--ink-2);padding-left:20px"><li>Settings, Connectors, <b>Add custom connector</b>.</li><li>Name it <b>DIGGD</b>, paste <code>${CONFIG.api}/mcp</code></li><li>Ask: <i>"What is about to be dug up on DIGGD?"</i></li></ol>`,
+      cursor: () => `<div class="codebox"><button class="cp">copy</button>{
+  "mcpServers": {
+    "diggd": { "url": "${CONFIG.api}/mcp" }
+  }
+}</div>`,
+      other: () => `<div class="codebox"><button class="cp">copy</button>curl ${CONFIG.api}/v1/bones?status=dug</div>`,
+    };
+    function agentTab(a) { document.querySelectorAll('#agent-tabs .tab').forEach((t) => t.setAttribute('aria-selected', t.dataset.a === a)); $('agent-body').innerHTML = AGENT[a](); }
+    async function loadMe() {
+      if (!me) { $('me').innerHTML = '<div class="note-book gate"><h3>Connect your wallet</h3><p>See your bones and your holder status.</p><button class="btn hot" id="me-sign" style="margin-top:16px">Connect wallet</button></div>'; $('me-sign').onclick = async () => { try { if (await signIn()) loadMe(); } catch (e) { toast(e.code === 4001 ? 'Cancelled.' : 'Sign-in failed.'); } }; return; }
+      try {
+        const r = await api('/v1/me');
+        $('me').innerHTML = `<div class="note-book"><div class="kv"><span>Wallet</span><b>${esc(r.wallet)}</b><span>$DIGGD held</span><b>${r.holds == null ? 'n/a before launch' : r.holds.toLocaleString('en-US')}</b><span>Reads first</span><b>${r.earlyAccess ? 'Yes' : 'No'}</b></div><button class="btn sm" id="me-out" style="margin-top:16px">Sign out</button></div>
+          <div class="board">${r.bones.length ? r.bones.map(plot).join('') : emptyBoard('Nothing buried from this wallet.')}</div>`;
+        digAll($('me'));
+        $('me-out').onclick = () => { signOut(); loadMe(); };
+      } catch (e) { $('me').innerHTML = `<div class="empty">${esc(e.message)}</div>`; }
+    }
+
+    // ---------- docs ----------
+    const DOCS = [...document.querySelectorAll('#doc-src > section')].map((s) => ({ slug: s.dataset.slug, group: s.dataset.group, title: s.dataset.title, el: s }));
+    function showDoc(slug) {
+      const d = DOCS.find((x) => x.slug === slug) || DOCS[0];
+      let side = '', g = '';
+      for (const x of DOCS) { if (x.group !== g) { g = x.group; side += `<b>${esc(g)}</b>`; } side += `<a href="#/docs/${x.slug}" class="${x === d ? 'on' : ''}">${esc(x.title)}</a>`; }
+      $('side').innerHTML = side;
+      $('doc-body').innerHTML = `<h1>${esc(d.title)}</h1>` + d.el.innerHTML;
+      document.title = `${d.title} · DIGGD docs`;
+    }
+
+    // ---------- routing ----------
+    const PAGES = { yard: 'The yard', b: 'Bone', bury: 'Bury a bone', agents: 'For agents', me: 'Your bones', token: '$DIGGD', roadmap: 'Roadmap', docs: 'Docs' };
+    function route() {
+      const parts = location.hash.replace(/^#\/?/, '').split('/');
+      const page = PAGES[parts[0]] ? parts[0] : 'home';
+      clearInterval(demoT);
+      document.querySelectorAll('.page').forEach((p) => p.classList.toggle('on', p.dataset.page === page));
+      document.querySelectorAll('[data-nav]').forEach((a) => a.classList.toggle('on', a.dataset.nav === (page === 'b' ? 'yard' : page)));
+      $('rail').classList.remove('open');
+      document.title = page === 'home' ? 'DIGGD — buried now, dug up at the target' : `${PAGES[page]} · DIGGD`;
+      if (page === 'home') loadHome();
+      if (page === 'yard') loadBoard();
+      if (page === 'b') loadBone(Number(parts[1]));
+      if (page === 'me') loadMe();
+      if (page === 'docs') showDoc(parts[1]);
+      window.scrollTo(0, 0);
+    }
+
+    function setup() {
+      document.querySelectorAll('.api-curl, .api-mcp').forEach((el) => (el.textContent = el.textContent.replace(/API/g, CONFIG.api)));
+      const fill = (sel, v) => document.querySelectorAll(sel).forEach((el) => (el.textContent = v));
+      fill('.bury-burn', CONFIG.buryBurn.toLocaleString('en-US')); fill('.bury-burn-short', kshort(CONFIG.buryBurn));
+      fill('.hold-early', CONFIG.holdEarly.toLocaleString('en-US')); fill('.hold-early-short', kshort(CONFIG.holdEarly));
+      fill('.early-min', CONFIG.earlyMin); fill('.min-target', '$' + CONFIG.minTarget.toLocaleString('en-US'));
+      $('bury-burn-note').hidden = !(CONFIG.mint && CONFIG.buryBurn);
+      const links = [];
+      if (CONFIG.mint) { $('ca').textContent = CONFIG.mint; links.push(`<a class="btn hot" href="https://pump.fun/coin/${CONFIG.mint}" target="_blank" rel="noopener">Buy on pump.fun</a>`); }
+      if (CONFIG.x) links.push(`<a class="btn" href="${CONFIG.x}" target="_blank" rel="noopener">X</a>`);
+      if (CONFIG.github) links.push(`<a class="btn" href="${CONFIG.github}" target="_blank" rel="noopener">GitHub</a>`);
+      $('token-links').innerHTML = links.join('');
+      $('foot-links').innerHTML = (CONFIG.x ? `<a href="${CONFIG.x}" target="_blank" rel="noopener">X</a>` : '') + (CONFIG.github ? `<a href="${CONFIG.github}" target="_blank" rel="noopener">GitHub</a>` : '') + '<a href="#/roadmap">Roadmap</a>';
+      $('burger').onclick = () => $('rail').classList.toggle('open');
+      const sign = async () => { if (me) { location.hash = '#/me'; return; } try { if (await signIn()) toast('Signed in.'); } catch (e) { toast(e.code === 4001 ? 'Cancelled.' : 'Sign-in failed.'); } };
+      $('nav-sign').onclick = sign; $('bar-sign').onclick = sign;
+      $('board-tabs').onclick = (e) => { const s = e.target.closest('[data-s]')?.dataset.s; if (s) { boardStatus = s; loadBoard(); } };
+      $('board-mint').onchange = loadBoard;
+      $('agent-tabs').onclick = (e) => { const a = e.target.closest('[data-a]')?.dataset.a; if (a) agentTab(a); };
+      $('bury-form').onsubmit = buryBone;
+      $('f-mint').onchange = lookToken;
+      $('f-presets').onclick = (e) => { const v = e.target.closest('[data-v]')?.dataset.v; if (v) $('f-target').value = v; };
+      document.addEventListener('click', (e) => { if (e.target.classList.contains('cp')) { const text = e.target.parentElement.textContent.replace(/^copy/, '').trim(); navigator.clipboard.writeText(text).then(() => toast('Copied.')); } });
+      window.addEventListener('resize', () => document.querySelectorAll('.shaft[data-now]').forEach((el) => paintShaft(el, Number(el.dataset.now))));
+      agentTab('code'); paintWho();
+    }
+
+    try { setup(); } catch (e) { console.error(e); }
+    window.addEventListener('hashchange', route);
+    try { route(); } catch (e) { console.error(e); }
+  })();
+  </script>
+</body>
+</html>

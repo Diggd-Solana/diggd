@@ -1,0 +1,39 @@
+<!doctype html><html><head><meta charset="utf-8">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bowlby+One&family=Space+Mono:wght@700&display=swap">
+<style>
+*{box-sizing:border-box;margin:0}body{background:#402414;color:#f4ead6;font-family:"Bowlby One",Impact,sans-serif;overflow:hidden}
+.mono{font-family:"Space Mono",monospace;font-weight:700}
+.sky{position:absolute;left:0;right:0;top:0;background:#f6ecd8}
+.grass{position:absolute;left:0;right:0;background:#6aa84f;border-bottom:8px solid #4f8a38}
+.soil{position:absolute;left:0;right:0;bottom:0;background:linear-gradient(180deg,#6b3f24 0 34%,#54301c 34% 68%,#402414 68%)}
+</style></head><body><div id="v"></div>
+<script>
+const T='#d9662b',K='#2a170d',C='#f4ead6';
+const BONE=(x1,x2,y,s=1)=>`<path d="M${x1} ${y}H${x2}" stroke="${C}" stroke-width="${3.4*s}" stroke-linecap="round"/><circle cx="${x1}" cy="${y-1.5*s}" r="${2.3*s}" fill="${C}"/><circle cx="${x1}" cy="${y+1.5*s}" r="${2.3*s}" fill="${C}"/><circle cx="${x2}" cy="${y-1.5*s}" r="${2.3*s}" fill="${C}"/><circle cx="${x2}" cy="${y+1.5*s}" r="${2.3*s}" fill="${C}"/>`;
+// dachshund head in profile, long ear, a bone in its mouth; the neck runs off the bottom
+const MARK=`<g transform="translate(-3 -1) scale(1.06)"><path d="M9 66L17 33L37 31L42 66Z" fill="${K}"/>
+<ellipse cx="29" cy="26" rx="13" ry="12" fill="${K}"/>
+<path d="M33 16L54 23.5L56 32.5L29 37Z" fill="${K}"/><circle cx="55" cy="27.6" r="4.6" fill="${K}"/>
+<path d="M21 16Q12 23 13.5 37Q15 48 23.5 47Q30 44.5 28.5 31Q27.5 21 21 16Z" fill="${K}" stroke="${T}" stroke-width="2.4"/>
+<circle cx="37" cy="23.2" r="2.5" fill="${T}"/><path d="M33 18.6L41.5 19.6" stroke="${T}" stroke-width="2" stroke-linecap="round"/>
+${BONE(38,56,35.5,1.15)}</g>`;
+const LOGO=(s,r=14)=>`<svg width="${s}" height="${s}" viewBox="0 0 64 64"><rect width="64" height="64" rx="${r}" fill="${T}"/>${MARK}</svg>`;
+// a shaft: hole dug from the surface down to a bone, frozen at p
+const shaft=(x,top,w,h,p,label)=>{const reach=h-70,d=p*reach;return `<div style="position:absolute;left:${x}px;top:${top}px;width:${w}px;height:${h}px;overflow:hidden">
+<div style="position:absolute;left:50%;top:0;width:46%;height:${d}px;transform:translateX(-50%);background:#1f1009;border-radius:0 0 60px 60px"></div>
+<div class="mono" style="position:absolute;left:0;right:0;top:${d-2}px;border-top:3px dashed #ffc94a;color:#ffc94a;font-size:20px;text-align:right;padding-top:4px">${label}</div>
+<svg viewBox="0 0 100 40" style="position:absolute;left:50%;bottom:24px;width:${w*.6}px;transform:translateX(-50%) rotate(-8deg)"><path d="M16 20H84" stroke="#f4ead6" stroke-width="15" stroke-linecap="round"/><circle cx="14" cy="12" r="10" fill="#f4ead6"/><circle cx="14" cy="28" r="10" fill="#f4ead6"/><circle cx="86" cy="12" r="10" fill="#f4ead6"/><circle cx="86" cy="28" r="10" fill="#f4ead6"/></svg></div>`};
+const v=location.hash.slice(1),el=document.getElementById('v');
+if(v==='avatar'){el.innerHTML=LOGO(400,0);}
+if(v==='logo')el.innerHTML=`<div style="width:600px;height:600px;display:grid;place-items:center;background:#f6ecd8">${LOGO(480)}</div>`;
+if(v==='header')el.innerHTML=`<div style="position:relative;width:1500px;height:500px">
+<div class="sky" style="height:300px"></div><div class="grass" style="top:300px;height:26px"></div><div class="soil" style="top:326px"></div>
+<div style="position:absolute;left:380px;top:70px;color:#2a170d"><div class="mono" style="font-size:18px;letter-spacing:.14em;color:#d9662b">SEALED MESSAGES · SOLANA</div><div style="font-size:72px;line-height:1;margin-top:16px">BURIED NOW.<br><span style="color:#d9662b">DUG UP AT 1M.</span></div></div>
+${shaft(1040,326,150,174,.55,'$550K')}${shaft(1230,326,150,174,.2,'$200K')}</div>`;
+if(v==='og')el.innerHTML=`<div style="position:relative;width:1200px;height:630px">
+<div class="sky" style="height:390px"></div><div class="grass" style="top:390px;height:28px"></div><div class="soil" style="top:418px"></div>
+<div style="position:absolute;left:80px;top:62px;display:flex;align-items:center;gap:18px;color:#2a170d">${LOGO(78)}<span style="font-size:48px">DIGGD</span></div>
+<div style="position:absolute;left:80px;top:180px;font-size:70px;line-height:1;color:#2a170d">BURIED NOW.<br><span style="color:#d9662b">DUG UP AT 1M.</span></div>
+<div class="mono" style="position:absolute;left:80px;top:460px;font-size:22px;color:#f4ead6;max-width:720px;line-height:1.5">Messages dug up at a market cap · Solana</div>
+${shaft(820,418,150,212,.66,'$660K')}${shaft(990,418,150,212,.3,'$300K')}</div>`;
+</script></body></html>

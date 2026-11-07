@@ -1,0 +1,32 @@
+name = "diggd-api"
+main = "src/index.js"
+compatibility_date = "2026-01-01"
+
+# Checks market caps and is dug up messages.
+[triggers]
+crons = ["*/2 * * * *"]
+
+# Create with `npx wrangler d1 create diggd` and paste the database_id here.
+[[d1_databases]]
+binding = "DB"
+database_name = "diggd"
+database_id = "30ed4015-43fd-4cdb-8236-68aa4ddfecfc"
+
+[vars]
+# $DIGGD mint after launch. Empty = no burn to bone, no holders-first window.
+TOKEN_ADDRESS = ""
+TOKEN_DECIMALS = "6"
+# $DIGGD burned to bone one message.
+BURY_BURN = "50000"
+# Holders of HOLD_EARLY $DIGGD read an dug message EARLY_MIN minutes before everyone else.
+HOLD_EARLY = "500000"
+EARLY_MIN = "5"
+# Market cap has to hold the target for this many checks in a row (one check every 2 minutes).
+CONFIRM_CHECKS = "2"
+MIN_TARGET_USD = "5000"
+# Public site, used in links returned by the API.
+SITE_URL = "https://diggd.fun"
+# Secrets (not here), set with `npx wrangler secret put <NAME>`:
+#   SOL_RPC_URL = your Helius (or other) mainnet RPC url
+#   BONE_KEY     = long random string that encrypts buried text. Losing it loses every sealed message.
+#   ADMIN_KEY   = long random string for POST /v1/admin/hide
