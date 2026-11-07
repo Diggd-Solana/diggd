@@ -7,6 +7,7 @@ Bury the roadmap, the next CA or the confession. Everyone sees a public teaser a
 - Site: https://diggd.fun
 - API: https://diggd-api.orchard-api.workers.dev
 - X: https://x.com/diggd_sol
+- GitHub: https://github.com/Diggd-Solana/diggd
 
 ## How it works
 1. **Bury.** Write a message, then pick a token and a market cap, a date, or both. Your wallet signs one transaction with a memo: `diggd:<sha256>`.
