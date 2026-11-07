@@ -57,6 +57,8 @@ curl https://diggd-rh-api.orchard-api.workers.dev/v1/bones?status=dug
 - Burn 50K in the same transaction for each bone.
 - Creator tax: 70% buy back and burn, 30% servers.
 
+Contract: `0x2fe05351f36c229651ebbc7a95dddea00eb3f709` on Pons.
+
 Both gates are off while `TOKEN_ADDRESS` is empty in `wrangler.toml`.
 
 ## Run your own

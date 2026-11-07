@@ -14,7 +14,7 @@ database_id = "88da917c-e93d-4ac9-8be0-a66a899a9af9"
 
 [vars]
 # $DIGGD contract after launch. Empty = no burn to bury, no holders-first window.
-TOKEN_ADDRESS = ""
+TOKEN_ADDRESS = "0x2fe05351f36c229651ebbc7a95dddea00eb3f709"
 TOKEN_DECIMALS = "18"
 # $DIGGD burned to bury one bone.
 BURY_BURN = "50000"
