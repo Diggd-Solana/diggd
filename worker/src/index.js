@@ -143,7 +143,7 @@ async function view(env, w, { reader = null, early = false } = {}) {
     publicAt: publicAt ? new Date(publicAt).toISOString() : null,
     holdersOnly: w.status === 'dug' && now < publicAt,
     body: null, salt: null,
-    url: `${env.SITE_URL || ''}/#/z/${w.id}`,
+    url: `${env.SITE_URL || ''}/#/b/${w.id}`,
   };
   if (readable) Object.assign(out, await unseal(env, w));
   return out;
